@@ -8,9 +8,11 @@ import { parseStreamedResponse } from "../utils/parseStreamedResponse";
 
 const ChatPage: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSendMessage = async (newMessage: string) => {
-    if (!newMessage.trim()) return;
+    if (!newMessage.trim() || isLoading) return;
+    setIsLoading(true);
 
     // 先更新 UI，新增使用者訊息
     const updatedMessages: Message[] = [
@@ -78,6 +80,8 @@ const ChatPage: React.FC = () => {
           content: errorMessage,
         },
       ]);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -92,7 +96,7 @@ const ChatPage: React.FC = () => {
           )
         )}
       </div>
-      <ChatInput onSendMessage={handleSendMessage} />
+      <ChatInput onSendMessage={handleSendMessage} isLoading={isLoading} />
     </div>
   );
 };
