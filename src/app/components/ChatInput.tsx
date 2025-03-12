@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Image from "next/image";
 
 interface ChatInputProps {
@@ -8,6 +8,7 @@ interface ChatInputProps {
 
 const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage }) => {
   const [input, setInput] = useState("");
+  const isComposing = useRef(false); // 使用 ref 來追蹤組字狀態避免一按 enter 就送出文字
 
   const handleSend = () => {
     if (input.trim()) {
@@ -25,7 +26,13 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage }) => {
           className="flex-grow p-3 rounded-lg bg-neutral-700 text-white outline-none"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && handleSend()}
+          onCompositionStart={() => (isComposing.current = true)}
+          onCompositionEnd={() => (isComposing.current = false)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && !isComposing.current) {
+              handleSend();
+            }
+          }}
         />
         <button
           className="ml-2 p-3 bg-white text-neutral-700 rounded-full cursor-pointer hover:bg-neutral-300"
