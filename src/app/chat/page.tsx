@@ -5,10 +5,12 @@ import UserMessage from "../components/UserMessage";
 import AiMessage from "../components/AiMessage";
 import ChatInput from "../components/ChatInput";
 import { parseStreamedResponse } from "../utils/parseStreamedResponse";
+import useQueryParam from "../utils/useQueryParam";
 
 const ChatPage: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const userKey = useQueryParam("userKey");
 
   const handleSendMessage = async (newMessage: string) => {
     if (!newMessage.trim() || isLoading) return;
@@ -33,7 +35,7 @@ const ChatPage: React.FC = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "user-key": "",
+          "user-key": userKey ? userKey : "",
         },
         body: JSON.stringify({ messages: updatedMessages }),
       });
