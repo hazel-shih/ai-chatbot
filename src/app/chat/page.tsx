@@ -94,7 +94,11 @@ const ChatPage: React.FC = () => {
           msg.role === MessageRole.User ? (
             <UserMessage key={index} message={msg.content} />
           ) : (
-            <AiMessage key={index} message={msg.content} />
+            <AiMessage
+              key={index}
+              message={msg.content}
+              isLoading={isLoading}
+            />
           )
         )}
       </div>
