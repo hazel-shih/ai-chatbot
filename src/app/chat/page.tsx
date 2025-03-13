@@ -1,5 +1,6 @@
 "use client";
-import { useState } from "react";
+import { useState, useRef } from "react";
+import { nanoid } from "nanoid";
 import { Message, MessageRole } from "../types";
 import UserMessage from "../components/UserMessage";
 import AiMessage from "../components/AiMessage";
@@ -12,19 +13,36 @@ const ChatPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const userKey = useQueryParam("userKey");
 
+  // 滾動到最後一則 UserMessage
+  const lastUserMessageRef = useRef<HTMLDivElement | null>(null);
+  const scrollToLatestUserMessage = () => {
+    if (lastUserMessageRef.current) {
+      lastUserMessageRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+  const userMessages = messages.filter((msg) => msg.role === MessageRole.User);
+  const lastUserMessage = userMessages[userMessages.length - 1];
+
   const handleSendMessage = async (newMessage: string) => {
     if (!newMessage.trim() || isLoading) return;
     setIsLoading(true);
 
-    // 先更新 UI，新增使用者訊息
-    const updatedMessages: Message[] = [
-      ...messages,
-      { role: MessageRole.User, content: newMessage },
-    ];
+    // 先更新 UI，新增使用者訊息（附帶 id）
+    const userMessage: Message = {
+      id: nanoid(),
+      role: MessageRole.User,
+      content: newMessage,
+    };
+
+    const updatedMessages = [...messages, userMessage];
     setMessages(updatedMessages);
 
-    // 加入一個 "assistant" 的 placeholder，讓 UI 顯示 AI 回應的 loading 狀態
+    // 立即滾動到新加入的使用者訊息
+    setTimeout(scrollToLatestUserMessage, 0);
+
+    // 加入 AI 回應的 placeholder
     const aiPlaceholderMessage: Message = {
+      id: nanoid(),
       role: MessageRole.Assistant,
       content: "Loading ...",
     };
@@ -37,18 +55,16 @@ const ChatPage: React.FC = () => {
           "Content-Type": "application/json",
           "user-key": userKey ? userKey : "",
         },
-        body: JSON.stringify({ messages: updatedMessages }),
+        body: JSON.stringify({
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          messages: updatedMessages.map(({ id, ...msg }) => msg),
+        }),
       });
 
       if (!response.ok) {
         let errorMessage = "🤖 AI 回應失敗，請稍後再試。";
-        switch (response.status) {
-          case 401:
-          case 403:
-            errorMessage = "🤖 未授權使用 chat bot，請聯絡管理員";
-            break;
-          default:
-            break;
+        if (response.status === 401 || response.status === 403) {
+          errorMessage = "🤖 未授權使用 chat bot，請聯絡管理員";
         }
         throw new Error(errorMessage);
       }
@@ -64,7 +80,7 @@ const ChatPage: React.FC = () => {
         setMessages((prev) => {
           const updated = [...prev];
           updated[updated.length - 1] = {
-            role: MessageRole.Assistant,
+            ...updated[updated.length - 1],
             content: assistantMessage,
           };
           return updated;
@@ -78,6 +94,7 @@ const ChatPage: React.FC = () => {
       setMessages((prev) => [
         ...prev.slice(0, -1), // 刪除 placeholder
         {
+          id: nanoid(),
           role: MessageRole.Assistant,
           content: errorMessage,
         },
@@ -90,12 +107,16 @@ const ChatPage: React.FC = () => {
   return (
     <div className="w-full h-screen bg-neutral-900 flex flex-col">
       <div className="flex-1 overflow-y-auto p-4">
-        {messages.map((msg, index) =>
+        {messages.map((msg) =>
           msg.role === MessageRole.User ? (
-            <UserMessage key={index} message={msg.content} />
+            <UserMessage
+              key={msg.id}
+              message={msg.content}
+              ref={msg === lastUserMessage ? lastUserMessageRef : null}
+            />
           ) : (
             <AiMessage
-              key={index}
+              key={msg.id}
               message={msg.content}
               isLoading={isLoading}
             />
