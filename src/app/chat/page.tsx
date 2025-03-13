@@ -52,17 +52,20 @@ const ChatPage: React.FC = () => {
     const trimmedMessages = trimMessagesToFit(updatedMessages); // 裁剪對話確保不超過 SAFE_LIMIT tokens
 
     try {
-      const response = await fetch("http://localhost:3001/chat-stream", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "user-key": userKey ? userKey : "",
-        },
-        body: JSON.stringify({
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          messages: trimmedMessages.map(({ id, ...msg }) => msg),
-        }),
-      });
+      const response = await fetch(
+        "https://ai-chatbot-server-tj16.onrender.com/chat-stream",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "user-key": userKey ? userKey : "",
+          },
+          body: JSON.stringify({
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            messages: trimmedMessages.map(({ id, ...msg }) => msg),
+          }),
+        }
+      );
 
       if (!response.ok) {
         let errorMessage = "🤖 AI 回應失敗，請稍後再試。";
