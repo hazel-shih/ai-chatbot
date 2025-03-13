@@ -7,6 +7,7 @@ import AiMessage from "../components/AiMessage";
 import ChatInput from "../components/ChatInput";
 import { parseStreamedResponse } from "../utils/parseStreamedResponse";
 import useQueryParam from "../utils/useQueryParam";
+import { trimMessagesToFit } from "../utils/trimMessagesToFit";
 
 const ChatPage: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -48,6 +49,8 @@ const ChatPage: React.FC = () => {
     };
     setMessages((prev) => [...prev, aiPlaceholderMessage]);
 
+    const trimmedMessages = trimMessagesToFit(updatedMessages); // 裁剪對話確保不超過 SAFE_LIMIT tokens
+
     try {
       const response = await fetch("http://localhost:3001/chat-stream", {
         method: "POST",
@@ -57,7 +60,7 @@ const ChatPage: React.FC = () => {
         },
         body: JSON.stringify({
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          messages: updatedMessages.map(({ id, ...msg }) => msg),
+          messages: trimmedMessages.map(({ id, ...msg }) => msg),
         }),
       });
 
