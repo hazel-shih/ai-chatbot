@@ -1,36 +1,46 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AI-Powered Chatbot
+This is a Next.js-powered chatbot interface that replicates the ChatGPT UI while integrating with OpenAI's API. It provides real-time streaming responses, markdown support, and optimized UI interactions for an intuitive chatbot experience.
 
-## Getting Started
+![ai-chatbot-demo](https://github.com/hazel-shih/ai-chatbot/blob/main/public/ai-chatbot-demo.gif)
 
-First, run the development server:
+Project link: https://ai-chatbot-nu-coral.vercel.app/chat
+⚠️ A valid user-key is required to access this chatbot. Please contact the author for authorization.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## 🚀 Features
+
+- **ChatGPT-like UI** - Sleek chat interface with message bubbles and input box.
+- **Real-time AI Responses** - Utilizes `ReadableStream` to stream OpenAI responses smoothly.
+- **Markdown Rendering** - Supports headers, lists, tables, and syntax highlighting.
+- **State Management for Chat History** - Maintains conversation flow using React state.
+- **Intelligent Input Handling** - Prevents accidental message submission for IME-based languages.
+- **Optimized Token Usage** - Automatically trims old messages to fit within OpenAI's token limit.
+- **Secure Backend API** - Routes API requests through a backend to protect API keys and control model settings.
+
+## 🏗 Tech Stack
+
+- **Frontend**: React, TypeScript, Next.js, TailwindCSS
+- **Backend API**: Node.js, hosted on Render
+- **Deployment**: 
+  - Frontend - Vercel
+  - Backend - Render (Node.js)
+
+## ⚡ Getting Started
+
+First, install dependencies:
+
+```sh
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Run the development server:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```sh
+npm run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Open [http://localhost:3000](http://localhost:3000/) in your browser to access the chatbot.
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+Let me know if you have any feedback or feature requests! 🚀
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
