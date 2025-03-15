@@ -2,12 +2,11 @@
 import { useState, useRef } from "react";
 import { nanoid } from "nanoid";
 import { Message, MessageRole } from "../types";
-import UserMessage from "../components/UserMessage";
-import AiMessage from "../components/AiMessage";
 import ChatInput from "../components/ChatInput";
+import { trimMessagesToFit } from "../utils/trimMessagesToFit";
+import ChatMessages from "../components/ChatMessages";
 import { parseStreamedResponse } from "../utils/parseStreamedResponse";
 import useQueryParam from "../utils/useQueryParam";
-import { trimMessagesToFit } from "../utils/trimMessagesToFit";
 
 const ChatPage: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -21,8 +20,6 @@ const ChatPage: React.FC = () => {
       lastUserMessageRef.current.scrollIntoView({ behavior: "smooth" });
     }
   };
-  const userMessages = messages.filter((msg) => msg.role === MessageRole.User);
-  const lastUserMessage = userMessages[userMessages.length - 1];
 
   const handleSendMessage = async (newMessage: string) => {
     if (!newMessage.trim() || isLoading) return;
@@ -112,23 +109,11 @@ const ChatPage: React.FC = () => {
 
   return (
     <div className="w-full h-screen bg-neutral-900 flex flex-col">
-      <div className="flex-1 overflow-y-auto p-4">
-        {messages.map((msg) =>
-          msg.role === MessageRole.User ? (
-            <UserMessage
-              key={msg.id}
-              message={msg.content}
-              ref={msg === lastUserMessage ? lastUserMessageRef : null}
-            />
-          ) : (
-            <AiMessage
-              key={msg.id}
-              message={msg.content}
-              isLoading={isLoading}
-            />
-          )
-        )}
-      </div>
+      <ChatMessages
+        messages={messages}
+        lastUserMessageRef={lastUserMessageRef}
+        isLoading={isLoading}
+      />
       <ChatInput onSendMessage={handleSendMessage} isLoading={isLoading} />
     </div>
   );
